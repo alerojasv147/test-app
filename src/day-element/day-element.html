@@ -1,0 +1,67 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="day-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      div {
+        width: 15px;
+        height: 15px;        
+        margin-bottom: 2px;
+        margin-left: 2px;
+        padding: 8px;
+        font-size: 14px;
+        text-align: center;
+      }
+      .weekend {
+        background-color: #ffff00;
+      }
+      .weekday {
+        background-color: #58ff58;
+      }
+      .holiday {
+        background-color: #ffa500;
+      }
+      .invalid {
+        background-color: #808080;
+      }
+    </style>
+
+    <div class$="[[type]]">
+      <template is="dom-if" if="[[_isValid(type)]]">
+        [[date]]
+      </template>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'day-element',
+
+      properties: {
+        type: {
+          type   : String,
+          notify : true,
+          value  : ""
+        },
+        date: {
+          type   : Number,
+          notify : true
+        }
+      },
+
+      /**
+       * Checks if the type of the day is valid
+       * @param {String} type
+       * @private
+       * @return {Boolean}
+       */
+      _isValid: function (type) {
+        return ( type !== "invalid" );
+      }
+    });
+  </script>
+</dom-module>

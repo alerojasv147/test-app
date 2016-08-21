@@ -1,0 +1,38 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<link rel="import" href="../day-element/day-element.html">
+
+<dom-module id="week-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .horizontal-layout {
+        @apply(--layout-horizontal);
+      }
+    </style>
+
+    <div class="horizontal-layout">
+      <template is="dom-repeat" items="[[days]]">
+        <day-element type="{{item.type}}" date="{{item.date}}"></day-element>
+      </template>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'week-element',
+
+      properties: {
+        days: {
+          type   : Array,
+          notify : true,
+          value  : []
+        }
+      }
+    });
+  </script>
+</dom-module>

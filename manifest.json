@@ -1,0 +1,7 @@
+{
+  "name": "calendar",
+  "short_name": "calendar",
+  "description": "Calendar Application using Google Polymer",
+  "start_url": "/",
+  "display": "standalone"
+}

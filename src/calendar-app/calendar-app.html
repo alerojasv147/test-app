@@ -1,0 +1,189 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<link rel="import" href="../month-element/month-element.html">
+
+<dom-module id="calendar-app">
+  <template>
+    <style>
+        label {
+          font-size: 16px;
+          font-weight: bold;
+          margin-right: 8px;
+        }
+        paper-button {
+          background: #ff6600;
+          color: #ffffff;
+          width: 100px;
+          margin: 8px 4px;
+        }
+        input {
+          margin-right: 8px;
+          height: 34px;
+        }
+        .medium-input {
+          min-width: 100px;
+          max-width: 200px;
+        }
+        .small-input {
+          width: 50px;
+        }
+        .container {
+          align-items: center;
+        }
+        .container > * {
+          display: inline-flex;
+        }
+    </style>
+
+    <h1>Calendar App</h1>
+    <div class="container">
+      <paper-item>
+        <label for="start_date">Start Date:</label>
+        <input id="start_date" class="medium-input" type="date" is="iron-input" bind-value="{{startDate}}">
+      </paper-item>
+      <paper-item>
+        <label for="num_days">Num. of days:</label>
+        <input id="num_days" class="small-input" type="number" is="iron-input" bind-value="{{numOfDays}}">
+      </paper-item>
+      <paper-item>
+        <label for="country_code">Country Code:</label>
+        <input id="country_code" class="small-input" type="text" is="iron-input" bind-value="{{countryCode}}">
+      </paper-item>
+      <paper-item>
+        <paper-button raised on-tap="_generate">Generate</paper-button>
+      </paper-item>
+    </div>
+
+    <!-- Calendar Section -->
+    <div>
+      <template is="dom-repeat" items="[[months]]">
+        <month-element 
+          year="[[item.year]]"
+          month="[[item.month]]"
+          weeks="[[item.weeks]]"
+          country-code="[[countryCode]]">
+        </month-element>
+      </template>
+    </div>    
+  </template>
+
+  <script>
+      Polymer({
+
+        is: 'calendar-app',
+
+        properties: {
+          startDate: {
+            type   : String,
+            notify : true,
+            value  : '2016-08-15'
+          },
+          numOfDays: {
+            type   : Number,
+            notify : true,
+            value  : 30
+          },
+          countryCode: {
+            type   : String,
+            notify : true,
+            value  : 'US'
+          },
+          months: {
+            type   : Array,
+            notify : true,
+            value  : []
+          }
+        },
+
+        /**
+         * Generates the calendar according to the user inputs
+         * @private
+         */
+        _generate: function() {
+          var current = moment(this.startDate),
+              end     = moment(this.startDate).add(this.numOfDays, 'days'),
+              months  = [],
+              weeks   = [];
+
+            this.set("months", []);
+
+            while ( current.isBefore(end) ) {
+              var key      = current.format("YYYY-MM"),
+                  monthIni = current.get("month"),
+                  days     = [];
+
+              // Create the necessary weeks
+              for ( var i = current.day(); i < 7; i++ ) {
+                if ( monthIni === current.get("month") ) {
+                  days[i] = {
+                    "date": current.format("D"),
+                    "type": this._getTypeDay(current)
+                  };
+                  current.add(1, 'days');
+                } else {
+                  break;
+                }
+              }
+
+              if ( !months[key] ) {
+                var month = {
+                  "year"  : current.format("YYYY"),
+                  "month" : current.format("MMMM"),
+                  "weeks" : []
+                };
+
+                month.weeks.push({
+                  "days": this._checkCompleteWeek(days)
+                });
+                months[key] = month;
+              } else {
+                months[key].weeks.push({
+                  "days": this._checkCompleteWeek(days)
+                });
+              }
+            }
+
+            for ( var i in months ) {
+              this.push("months", months[i]);
+            }
+        },
+
+        /**
+         * Determines if the date is a weekday, weekend, holiday or a invalid day
+         * @param {Object} current
+         * @private
+         * @return {String}
+         */
+        _getTypeDay: function(current) {
+            var type = "";
+            if ( current.day() === 6 || current.day() === 0 ) {
+              type = "weekend";
+            } else {
+              type = "weekday";
+            }
+
+            return type;
+        },
+
+        /**
+         * Checks the state of each day and fill with invalid days
+         * @param days
+         * @private
+         */
+        _checkCompleteWeek: function(days) {
+          for ( var i=0; i<7; i++ ) {
+            if ( !days[i] ) {
+              days[i] = {
+                "type" : "invalid"
+              }
+            }
+          }
+          return days;
+        }
+      });
+  </script>
+</dom-module> 
